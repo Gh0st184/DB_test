@@ -1,0 +1,19 @@
+/*
+Домашнее задание к 6 уроку.
+1. Пусть задан некоторый пользователь. Из всех друзей этого пользователя найдите человека, который больше всех общался с нашим пользователем.
+
+Допустим пользователь с firstname = 'Reuben'
+*/
+
+select (select firstname from users where id = new_table.from_user_id) as name_friend, number_message from
+	(select count(*) as number_message, from_user_id, to_user_id
+	from messages 
+	where to_user_id = (select id from users where firstname = 'Reuben')
+	group by from_user_id 
+	) as new_table
+where 
+	(select status 
+	from friend_requests 
+	where (initiator_user_id = from_user_id and target_user_id = to_user_id) 
+		  or (initiator_user_id = to_user_id and target_user_id = from_user_id)) = 'approved'
+order by number_message desc limit 1;
